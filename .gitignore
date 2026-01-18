@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.pem
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.sqlite
+
+# Uploads
+uploads/
+prelandings/
+temp/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Auto Claude data directory
+.auto-claude/
+
+# Temporary files
+~$*
+~WRL*.tmp
+*.tmp
+
+# Generated docs
+Prelanding_AI_Guide.docx
+create_guide_docx.py
+
+# Local development
+*.local
+
+# Templates data (user content)
+templates/
+
+# Spec files
+prelanding-ai-spec-v1-full.md
+
+# Package lock (optional)
+# package-lock.json
