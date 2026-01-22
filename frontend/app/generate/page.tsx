@@ -238,7 +238,7 @@ export default function GeneratePage() {
                                     value={formData.target_length}
                                     onChange={(v) => setFormData({ ...formData, target_length: v })}
                                     min={400}
-                                    max={1500}
+                                    max={5000}
                                     step={50}
                                     unit=" слов"
                                 />
