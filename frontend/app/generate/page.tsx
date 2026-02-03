@@ -2,10 +2,9 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Wand2, Loader2, Download, FileText, Code, Lightbulb, Sparkles, Flame, PartyPopper, HelpCircle, GraduationCap, TrendingUp, BarChart3, Coins, Rocket, Briefcase, Monitor, Star, Search, Settings } from 'lucide-react';
+import { Wand2, Loader2, Download, FileText, Code, Sparkles, Settings, Users, Star, Copy, Check } from 'lucide-react';
 import axios from 'axios';
 import Slider from '../components/Slider';
-import Tooltip from '../components/Tooltip';
 import ScenarioManager from '../components/ScenarioManager';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -61,21 +60,6 @@ export default function GeneratePage() {
         { value: 'RU', label: '🇷🇺 Россия', hint: 'Прямой, рубли' },
         { value: 'PL', label: '🇵🇱 Polska', hint: 'Direct, PLN currency' },
         { value: 'NL', label: '🇳🇱 Nederland', hint: 'No-nonsense, pragmatic' }
-    ];
-
-    const personas = [
-        { value: 'aggressive_investigator', label: 'Агрессивный Журналист', icon: Flame, tooltip: 'Разоблачающий стиль, провокационные вопросы, сенсационные заголовки' },
-        { value: 'excited_fan', label: 'Восторженный Фанат', icon: PartyPopper, tooltip: 'Эмоциональный, восторженный, делится открытием с другом' },
-        { value: 'skeptical_journalist', label: 'Скептичный Репортёр', icon: HelpCircle, tooltip: 'Сначала сомневается, потом убеждается фактами' },
-        { value: 'experienced_expert', label: 'Опытный Эксперт', icon: GraduationCap, tooltip: 'Авторитетный тон, профессиональный анализ, данные' },
-        { value: 'growth_marketer', label: 'Growth Маркетолог', icon: TrendingUp, tooltip: 'ROI, кейсы, метрики конверсии, A/B тесты' },
-        { value: 'data_analyst', label: 'Аналитик Данных', icon: BarChart3, tooltip: 'Цифры, статистика, графики, исследования' },
-        { value: 'crypto_investor', label: 'Криптоинвестор', icon: Coins, tooltip: 'Инсайды крипто-комьюнити, тренды, HODL культура' },
-        { value: 'startup_founder', label: 'Стартапер', icon: Rocket, tooltip: 'Визионерство, disruption, growth story' },
-        { value: 'financial_advisor', label: 'Финансовый Советник', icon: Briefcase, tooltip: 'Консервативный подход, риски, долгосрочность' },
-        { value: 'tech_blogger', label: 'Техноблогер', icon: Monitor, tooltip: 'Обзоры, туториалы, как это работает' },
-        { value: 'lifestyle_influencer', label: 'Лайфстайл Инфлюенсер', icon: Star, tooltip: 'Личная история, трансформация, FOMO' },
-        { value: 'skeptical_reviewer', label: 'Критический Ревьюер', icon: Search, tooltip: 'Честный обзор, все за и против' }
     ];
 
     const complianceLevels = [
@@ -141,7 +125,7 @@ export default function GeneratePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-8">
-            <div className="container mx-auto px-4 max-w-6xl">
+            <div className="container mx-auto px-4 max-w-7xl">
                 {/* Page Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold mb-2">
@@ -152,6 +136,15 @@ export default function GeneratePage() {
                     </p>
                 </div>
 
+                {/* Generators Section */}
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold mb-4">Генераторы Имён и Отзывов</h2>
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <NameGenerator />
+                        <ReviewGenerator />
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     {/* Form */}
                     <motion.div
@@ -159,6 +152,7 @@ export default function GeneratePage() {
                         animate={{ opacity: 1, x: 0 }}
                         className="glass-card p-6"
                     >
+                        <h2 className="text-xl font-bold mb-4">Генерация Текста</h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* GEO - Target Country */}
                             <div>
@@ -224,30 +218,6 @@ export default function GeneratePage() {
                                     onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
                                     required
                                 />
-                            </div>
-
-                            {/* Persona */}
-                            <div>
-                                <label className="block text-sm font-medium mb-2">Персона</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {personas.map((persona) => (
-                                        <Tooltip key={persona.value} content={persona.tooltip} position="top">
-                                            <button
-                                                type="button"
-                                                className={`p-3 rounded-lg border transition-all w-full ${formData.persona === persona.value
-                                                    ? 'border-primary bg-primary/10'
-                                                    : 'border-border hover:border-primary/50'
-                                                    }`}
-                                                onClick={() => setFormData({ ...formData, persona: persona.value })}
-                                            >
-                                                <div className="flex justify-center mb-1">
-                                                    <persona.icon className="w-6 h-6 text-primary" />
-                                                </div>
-                                                <div className="text-xs font-medium">{persona.label}</div>
-                                            </button>
-                                        </Tooltip>
-                                    ))}
-                                </div>
                             </div>
 
                             {/* Scenario Selection */}
@@ -455,7 +425,7 @@ export default function GeneratePage() {
                                     </div>
                                     <h3 className="text-lg font-semibold text-foreground mb-2">Готовы создать копирайт?</h3>
                                     <p className="text-sm mb-4">
-                                        Заполните форму слева, выберите персону и нажмите «Сгенерировать»
+                                        Заполните форму слева, выберите сценарий и нажмите «Сгенерировать»
                                     </p>
                                     <div className="text-sm text-muted-foreground/70">
                                         Совет: RAG использует успешные примеры из базы знаний
@@ -474,5 +444,416 @@ export default function GeneratePage() {
                 />
             </div>
         </div >
+    );
+}
+
+// Name Generator Component
+function NameGenerator() {
+    const [geo, setGeo] = useState('RU');
+    const [gender, setGender] = useState('random');
+    const [count, setCount] = useState(10);
+    const [includeNickname, setIncludeNickname] = useState(true);
+    const [names, setNames] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+    const geoOptions = [
+        { value: 'DE', label: '🇩🇪 Германия' },
+        { value: 'AT', label: '🇦🇹 Австрия' },
+        { value: 'CH', label: '🇨🇭 Швейцария' },
+        { value: 'FR', label: '🇫🇷 Франция' },
+        { value: 'ES', label: '🇪🇸 Испания' },
+        { value: 'IT', label: '🇮🇹 Италия' },
+        { value: 'UK', label: '🇬🇧 Великобритания' },
+        { value: 'US', label: '🇺🇸 США' },
+        { value: 'CA', label: '🇨🇦 Канада' },
+        { value: 'RU', label: '🇷🇺 Россия' },
+        { value: 'PL', label: '🇵🇱 Польша' },
+        { value: 'NL', label: '🇳🇱 Нидерланды' }
+    ];
+
+    const handleGenerate = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post(`${API_URL}/api/generators/names`, {
+                geo,
+                gender,
+                count,
+                include_nickname: includeNickname
+            });
+            setNames(response.data);
+        } catch (error) {
+            console.error('Ошибка генерации имён:', error);
+            alert('Ошибка генерации имён');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const copyToClipboard = (index: number, name: any) => {
+        const text = `${name.first_name} ${name.last_name}${name.nickname ? ` (@${name.nickname})` : ''}`;
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text);
+        } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (error) {
+                console.error('Ошибка копирования:', error);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card p-6"
+        >
+            <div className="flex items-center mb-4">
+                <Users className="w-6 h-6 text-primary mr-2" />
+                <h3 className="text-xl font-bold">Генератор Имён</h3>
+            </div>
+
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium mb-2">Страна</label>
+                    <select
+                        value={geo}
+                        onChange={(e) => setGeo(e.target.value)}
+                        className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                        {geoOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Пол</label>
+                    <div className="grid grid-cols-3 gap-2">
+                        {['male', 'female', 'random'].map((g) => (
+                            <button
+                                key={g}
+                                type="button"
+                                onClick={() => setGender(g)}
+                                className={`py-2 px-3 rounded-lg border transition-colors text-sm ${
+                                    gender === g
+                                        ? 'bg-primary text-white border-primary'
+                                        : 'bg-muted border-border hover:border-primary/50'
+                                }`}
+                            >
+                                {g === 'male' ? 'М' : g === 'female' ? 'Ж' : 'Любой'}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Количество: {count}</label>
+                    <input
+                        type="range"
+                        min={1}
+                        max={50}
+                        value={count}
+                        onChange={(e) => setCount(parseInt(e.target.value))}
+                        className="w-full"
+                    />
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <label className="text-sm font-medium">Включить никнеймы</label>
+                    <input
+                        type="checkbox"
+                        checked={includeNickname}
+                        onChange={(e) => setIncludeNickname(e.target.checked)}
+                        className="w-4 h-4"
+                    />
+                </div>
+
+                <button
+                    onClick={handleGenerate}
+                    disabled={loading}
+                    className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center disabled:opacity-50"
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Генерация...
+                        </>
+                    ) : (
+                        'Сгенерировать имена'
+                    )}
+                </button>
+
+                {names.length > 0 && (
+                    <div className="mt-4">
+                        <h4 className="font-medium mb-2 text-sm">Результат ({names.length}):</h4>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {names.map((name, index) => (
+                                <div key={index} className="p-2 bg-muted rounded-lg text-sm group hover:bg-muted/80 transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <div className="font-medium">
+                                                {name.first_name} {name.last_name}
+                                            </div>
+                                            {name.nickname && (
+                                                <div className="text-xs text-muted-foreground">
+                                                    @{name.nickname}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => copyToClipboard(index, name)}
+                                            className="ml-2 p-1 hover:bg-background rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                            title="Копировать"
+                                        >
+                                            {copiedIndex === index ? (
+                                                <Check className="w-4 h-4 text-green-500" />
+                                            ) : (
+                                                <Copy className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </motion.div>
+    );
+}
+
+// Review Generator Component
+function ReviewGenerator() {
+    const [geo, setGeo] = useState('RU');
+    const [language, setLanguage] = useState('ru');
+    const [vertical, setVertical] = useState('crypto');
+    const [length, setLength] = useState<'short' | 'medium'>('medium');
+    const [count, setCount] = useState(5);
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+    const geoOptions = [
+        { value: 'DE', label: '🇩🇪 Германия' },
+        { value: 'RU', label: '🇷🇺 Россия' },
+        { value: 'US', label: '🇺🇸 США' },
+        { value: 'UK', label: '🇬🇧 Великобритания' },
+        { value: 'FR', label: '🇫🇷 Франция' },
+        { value: 'ES', label: '🇪🇸 Испания' },
+        { value: 'IT', label: '🇮🇹 Италия' },
+    ];
+
+    const languageOptions = [
+        { value: 'de', label: 'Немецкий' },
+        { value: 'en', label: 'English' },
+        { value: 'ru', label: 'Русский' },
+        { value: 'fr', label: 'Français' },
+        { value: 'es', label: 'Español' },
+        { value: 'it', label: 'Italiano' },
+    ];
+
+    const handleGenerate = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post(`${API_URL}/api/generators/reviews`, {
+                geo,
+                language,
+                vertical,
+                length,
+                count
+            });
+            setReviews(response.data);
+        } catch (error) {
+            console.error('Ошибка генерации отзывов:', error);
+            alert('Ошибка генерации отзывов');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const copyToClipboard = (index: number, review: any) => {
+        const text = `${review.author_name} (${review.rating}/5)\n${review.text}\n+${review.amount} ${review.currency}\n📷 ${review.screenshot_description}`;
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text);
+        } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (error) {
+                console.error('Ошибка копирования:', error);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="glass-card p-6"
+        >
+            <div className="flex items-center mb-4">
+                <Star className="w-6 h-6 text-primary mr-2" />
+                <h3 className="text-xl font-bold">Генератор Отзывов</h3>
+            </div>
+
+            <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Страна</label>
+                        <select
+                            value={geo}
+                            onChange={(e) => setGeo(e.target.value)}
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                        >
+                            {geoOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Язык</label>
+                        <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
+                            className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                        >
+                            {languageOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Вертикаль</label>
+                    <select
+                        value={vertical}
+                        onChange={(e) => setVertical(e.target.value)}
+                        className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    >
+                        <option value="crypto">Crypto</option>
+                        <option value="forex">Forex</option>
+                        <option value="stocks">Stocks</option>
+                        <option value="general_investment">General Investment</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Длина</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {[
+                            { value: 'short', label: 'Короткий' },
+                            { value: 'medium', label: 'Средний' }
+                        ].map((l) => (
+                            <button
+                                key={l.value}
+                                type="button"
+                                onClick={() => setLength(l.value as 'short' | 'medium')}
+                                className={`py-2 px-3 rounded-lg border transition-colors text-sm ${
+                                    length === l.value
+                                        ? 'bg-primary text-white border-primary'
+                                        : 'bg-muted border-border hover:border-primary/50'
+                                }`}
+                            >
+                                {l.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Количество: {count}</label>
+                    <input
+                        type="range"
+                        min={1}
+                        max={20}
+                        value={count}
+                        onChange={(e) => setCount(parseInt(e.target.value))}
+                        className="w-full"
+                    />
+                </div>
+
+                <button
+                    onClick={handleGenerate}
+                    disabled={loading}
+                    className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center disabled:opacity-50"
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Генерация...
+                        </>
+                    ) : (
+                        'Сгенерировать отзывы'
+                    )}
+                </button>
+
+                {reviews.length > 0 && (
+                    <div className="mt-4">
+                        <h4 className="font-medium mb-2 text-sm">Результат ({reviews.length}):</h4>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {reviews.map((review, index) => (
+                                <div key={index} className="p-3 bg-muted rounded-lg space-y-1 group hover:bg-muted/80 transition-colors relative">
+                                    <button
+                                        onClick={() => copyToClipboard(index, review)}
+                                        className="absolute top-2 right-2 p-1 hover:bg-background rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                        title="Копировать"
+                                    >
+                                        {copiedIndex === index ? (
+                                            <Check className="w-4 h-4 text-green-500" />
+                                        ) : (
+                                            <Copy className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                                        )}
+                                    </button>
+                                    <div className="flex justify-between items-start pr-8">
+                                        <div className="font-medium text-sm">{review.author_name}</div>
+                                        <div className="text-yellow-500 text-xs">
+                                            {'★'.repeat(review.rating)}
+                                        </div>
+                                    </div>
+                                    <div className="text-xs">{review.text}</div>
+                                    <div className="text-xs font-medium text-green-600">
+                                        +{review.amount?.toLocaleString()} {review.currency}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </motion.div>
     );
 }

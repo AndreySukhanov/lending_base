@@ -10,7 +10,6 @@ export default function Header() {
     const navItems = [
         { href: '/', label: 'Главная', icon: Home },
         { href: '/generate', label: 'Генерация', icon: Sparkles },
-        { href: '/generators', label: 'Генераторы', icon: Wand },
         { href: '/library', label: 'База знаний', icon: Library }
     ];
 
