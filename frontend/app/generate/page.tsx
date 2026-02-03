@@ -778,6 +778,17 @@ function ReviewGenerator() {
 
                 <div className="grid grid-cols-2 gap-3">
                     <div>
+                        <label className="block text-sm font-medium mb-2">Кол-во: {count}</label>
+                        <input
+                            type="range"
+                            min={1}
+                            max={20}
+                            value={count}
+                            onChange={(e) => setCount(parseInt(e.target.value))}
+                            className="w-full mt-2"
+                        />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium mb-2">Длина</label>
                         <div className="grid grid-cols-2 gap-2">
                             {[
@@ -798,17 +809,6 @@ function ReviewGenerator() {
                                 </button>
                             ))}
                         </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-2">Кол-во: {count}</label>
-                        <input
-                            type="range"
-                            min={1}
-                            max={20}
-                            value={count}
-                            onChange={(e) => setCount(parseInt(e.target.value))}
-                            className="w-full mt-2"
-                        />
                     </div>
                 </div>
 
