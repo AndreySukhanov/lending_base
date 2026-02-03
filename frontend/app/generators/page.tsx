@@ -36,7 +36,7 @@ function NameGenerator() {
     const [includeNickname, setIncludeNickname] = useState(true);
     const [names, setNames] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [copied, setCopied] = useState(false);
+    const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
     const geoOptions = [
         { value: 'DE', label: '🇩🇪 Германия' },
@@ -71,10 +71,8 @@ function NameGenerator() {
         }
     };
 
-    const copyToClipboard = () => {
-        const text = names.map(n =>
-            `${n.first_name} ${n.last_name}${n.nickname ? ` (@${n.nickname})` : ''} [${n.gender}]`
-        ).join('\n');
+    const copyToClipboard = (index: number, name: any) => {
+        const text = `${name.first_name} ${name.last_name}${name.nickname ? ` (@${name.nickname})` : ''} [${name.gender}]`;
 
         // Проверяем доступность Clipboard API (работает только на HTTPS или localhost)
         if (navigator.clipboard && window.isSecureContext) {
@@ -96,8 +94,8 @@ function NameGenerator() {
             document.body.removeChild(textArea);
         }
 
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
     };
 
     return (
@@ -189,32 +187,36 @@ function NameGenerator() {
 
                 {names.length > 0 && (
                     <div className="mt-6">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-medium">Результат ({names.length}):</h3>
-                            <button
-                                onClick={copyToClipboard}
-                                className="text-xs text-muted-foreground hover:text-primary flex items-center"
-                            >
-                                {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-                                {copied ? 'Скопировано!' : 'Копировать'}
-                            </button>
-                        </div>
+                        <h3 className="font-medium mb-3">Результат ({names.length}):</h3>
                         <div className="space-y-2 max-h-96 overflow-y-auto">
                             {names.map((name, index) => (
-                                <div key={index} className="p-3 bg-muted rounded-lg text-sm">
+                                <div key={index} className="p-3 bg-muted rounded-lg text-sm group hover:bg-muted/80 transition-colors">
                                     <div className="flex items-center justify-between">
-                                        <div className="font-medium">
-                                            {name.first_name} {name.last_name}
-                                            <span className="ml-2 text-muted-foreground">
-                                                {name.gender === 'male' ? '♂' : '♀'}
-                                            </span>
+                                        <div className="flex-1">
+                                            <div className="font-medium">
+                                                {name.first_name} {name.last_name}
+                                                <span className="ml-2 text-muted-foreground">
+                                                    {name.gender === 'male' ? '♂' : '♀'}
+                                                </span>
+                                            </div>
+                                            {name.nickname && (
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    @{name.nickname}
+                                                </div>
+                                            )}
                                         </div>
+                                        <button
+                                            onClick={() => copyToClipboard(index, name)}
+                                            className="ml-3 p-2 hover:bg-background rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                            title="Копировать"
+                                        >
+                                            {copiedIndex === index ? (
+                                                <Check className="w-4 h-4 text-green-500" />
+                                            ) : (
+                                                <Copy className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                                            )}
+                                        </button>
                                     </div>
-                                    {name.nickname && (
-                                        <div className="text-xs text-muted-foreground mt-1">
-                                            @{name.nickname}
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
@@ -233,7 +235,7 @@ function ReviewGenerator() {
     const [count, setCount] = useState(5);
     const [reviews, setReviews] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [copied, setCopied] = useState(false);
+    const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
     const geoOptions = [
         { value: 'DE', label: '🇩🇪 Германия' },
@@ -273,10 +275,8 @@ function ReviewGenerator() {
         }
     };
 
-    const copyToClipboard = () => {
-        const text = reviews.map(r =>
-            `${r.author_name} (${r.rating}/5)\n${r.text}\n+${r.amount} ${r.currency}\n📷 ${r.screenshot_description}\n`
-        ).join('\n---\n\n');
+    const copyToClipboard = (index: number, review: any) => {
+        const text = `${review.author_name} (${review.rating}/5)\n${review.text}\n+${review.amount} ${review.currency}\n📷 ${review.screenshot_description}`;
 
         // Проверяем доступность Clipboard API (работает только на HTTPS или localhost)
         if (navigator.clipboard && window.isSecureContext) {
@@ -298,8 +298,8 @@ function ReviewGenerator() {
             document.body.removeChild(textArea);
         }
 
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
     };
 
     return (
@@ -416,20 +416,22 @@ function ReviewGenerator() {
 
                 {reviews.length > 0 && (
                     <div className="mt-6">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-medium">Результат ({reviews.length}):</h3>
-                            <button
-                                onClick={copyToClipboard}
-                                className="text-xs text-muted-foreground hover:text-primary flex items-center"
-                            >
-                                {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-                                {copied ? 'Скопировано!' : 'Копировать'}
-                            </button>
-                        </div>
+                        <h3 className="font-medium mb-3">Результат ({reviews.length}):</h3>
                         <div className="space-y-3 max-h-96 overflow-y-auto">
                             {reviews.map((review, index) => (
-                                <div key={index} className="p-4 bg-muted rounded-lg space-y-2">
-                                    <div className="flex justify-between items-start">
+                                <div key={index} className="p-4 bg-muted rounded-lg space-y-2 group hover:bg-muted/80 transition-colors relative">
+                                    <button
+                                        onClick={() => copyToClipboard(index, review)}
+                                        className="absolute top-3 right-3 p-2 hover:bg-background rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                        title="Копировать"
+                                    >
+                                        {copiedIndex === index ? (
+                                            <Check className="w-4 h-4 text-green-500" />
+                                        ) : (
+                                            <Copy className="w-4 h-4 text-muted-foreground hover:text-primary" />
+                                        )}
+                                    </button>
+                                    <div className="flex justify-between items-start pr-10">
                                         <div className="font-medium text-sm">{review.author_name}</div>
                                         <div className="text-yellow-500 text-xs">
                                             {'★'.repeat(review.rating)}
