@@ -72,7 +72,7 @@ function NameGenerator() {
     };
 
     const copyToClipboard = (index: number, name: any) => {
-        const text = `${name.first_name} ${name.last_name}${name.nickname ? ` (@${name.nickname})` : ''} [${name.gender}]`;
+        const text = `${name.first_name} ${name.last_name}${name.nickname ? ` (@${name.nickname})` : ''}`;
 
         // Проверяем доступность Clipboard API (работает только на HTTPS или localhost)
         if (navigator.clipboard && window.isSecureContext) {
@@ -195,9 +195,6 @@ function NameGenerator() {
                                         <div className="flex-1">
                                             <div className="font-medium">
                                                 {name.first_name} {name.last_name}
-                                                <span className="ml-2 text-muted-foreground">
-                                                    {name.gender === 'male' ? '♂' : '♀'}
-                                                </span>
                                             </div>
                                             {name.nickname && (
                                                 <div className="text-xs text-muted-foreground mt-1">
