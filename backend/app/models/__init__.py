@@ -9,6 +9,7 @@ from app.models.prelanding import (
     PrelendingFormat,
     ElementType
 )
+from app.models.scenario import Scenario
 
 __all__ = [
     "Base",
@@ -18,6 +19,7 @@ __all__ = [
     "PerformanceFeedback",
     "PrelendingStatus",
     "PrelendingFormat",
-    "ElementType"
+    "ElementType",
+    "Scenario"
 ]
 

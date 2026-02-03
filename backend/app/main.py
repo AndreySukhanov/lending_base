@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import prelandings, generation, feedback
+from app.routes import prelandings, generation, feedback, scenarios, generators
 from app.config import settings
 from app.database import engine
 from app.models import Base
@@ -34,6 +34,8 @@ app.add_middleware(
 app.include_router(prelandings.router)
 app.include_router(generation.router)
 app.include_router(feedback.router)
+app.include_router(scenarios.router)
+app.include_router(generators.router)
 
 
 @app.get("/")

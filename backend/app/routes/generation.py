@@ -5,7 +5,14 @@ from datetime import datetime
 
 from app.database import get_db
 from app.models import GeneratedPrelanding
-from app.schemas import GenerationRequest, GenerationResponse, ExportRequest, ExportResponse
+from app.schemas import (
+    GenerationRequest,
+    GenerationResponse,
+    ExportRequest,
+    ExportResponse,
+    ScenarioGenerationRequest,
+    ScenarioGenerationResponse
+)
 from app.services import CopyGenerator, OutputFormatter
 
 router = APIRouter(prefix="/api/generate", tags=["generation"])
@@ -125,3 +132,49 @@ def export_generated_prelanding(
         content=content,
         format=request.format
     )
+
+
+@router.post("/with-scenario", response_model=ScenarioGenerationResponse)
+async def generate_with_scenario(
+    request: ScenarioGenerationRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate prelanding using scenario-based three-part structure.
+    """
+    try:
+        print(f"Starting scenario-based generation for offer: {request.offer}")
+        print(f"Scenario ID: {request.scenario_id}")
+
+        # Generate with scenario
+        generator = CopyGenerator(db)
+        result = await generator.generate_with_scenario(
+            scenario_id=request.scenario_id,
+            geo=request.geo,
+            language=request.language,
+            vertical=request.vertical,
+            offer=request.offer,
+            persona=request.persona,
+            compliance_level=request.compliance_level,
+            use_rag=request.use_rag
+        )
+
+        print("Scenario-based generation completed successfully")
+
+        return ScenarioGenerationResponse(
+            gen_id=result['gen_id'],
+            beginning=result['beginning'],
+            middle=result['middle'],
+            end=result['end'],
+            full_text=result['full_text'],
+            scenario=result['scenario'],
+            compliance_passed=result['compliance_passed'],
+            compliance_issues=result['compliance_issues'],
+            tokens_used=result['tokens_used'],
+            created_at=datetime.utcnow()
+        )
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

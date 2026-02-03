@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, Library, Home } from 'lucide-react';
+import { Sparkles, Library, Home, Wand } from 'lucide-react';
 
 export default function Header() {
     const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function Header() {
     const navItems = [
         { href: '/', label: 'Главная', icon: Home },
         { href: '/generate', label: 'Генерация', icon: Sparkles },
+        { href: '/generators', label: 'Генераторы', icon: Wand },
         { href: '/library', label: 'База знаний', icon: Library }
     ];
 

@@ -555,5 +555,339 @@ Generate the complete prelanding copy now (remember: in {language} language!):
 """
         
         return prompt
-    
+
+    async def generate_with_scenario(
+        self,
+        scenario_id: int,
+        geo: str,
+        language: str,
+        vertical: str,
+        offer: str,
+        persona: str,
+        compliance_level: str,
+        use_rag: bool = True
+    ) -> Dict:
+        """
+        Generate prelanding using scenario-based three-part structure.
+
+        Args:
+            scenario_id: ID of scenario to use
+            geo: Target geography
+            language: Target language
+            vertical: Vertical (crypto, finance, etc.)
+            offer: What is being promoted
+            persona: Writing persona
+            compliance_level: Compliance strictness
+            use_rag: Whether to use RAG
+
+        Returns:
+            Dict with gen_id, beginning, middle, end, full_text, scenario info
+        """
+        from app.services.scenario_manager import ScenarioManager
+        from app.models.prelanding import GeneratedPrelanding
+        import uuid
+
+        # Get scenario
+        scenario_manager = ScenarioManager(self.db)
+        scenario = scenario_manager.get_by_id(scenario_id)
+
+        if not scenario:
+            raise ValueError(f"Scenario with id {scenario_id} not found")
+
+        # Get RAG context if enabled
+        rag_context = ""
+        source_ids = []
+        if use_rag:
+            try:
+                context = self.rag_retriever.build_context_for_generation(
+                    offer=offer,
+                    geo=geo,
+                    vertical=vertical,
+                    persona=persona
+                )
+                source_ids = [w['id'] for w in context.get('winners', [])]
+                # Format RAG context as text
+                rag_context = self._format_rag_context(context)
+            except Exception as e:
+                print(f"RAG retrieval failed: {e}")
+                rag_context = ""
+
+        # Get persona config
+        persona_config = self.PERSONAS.get(persona, self.PERSONAS['aggressive_investigator'])
+
+        # Generate three parts sequentially
+        beginning = await self._generate_beginning(
+            scenario, geo, language, vertical, offer, persona_config, rag_context
+        )
+
+        middle = await self._generate_middle(
+            scenario, geo, language, vertical, offer, persona_config,
+            beginning, rag_context
+        )
+
+        end = await self._generate_end(
+            scenario, geo, language, vertical, offer, persona_config,
+            beginning, middle, rag_context
+        )
+
+        # Concatenate parts
+        full_text = f"{beginning}\n\n{middle}\n\n{end}"
+
+        # Compliance check
+        from app.services.compliance_checker import ComplianceChecker
+        compliance_checker = ComplianceChecker(compliance_level=compliance_level)
+        compliance_result = compliance_checker.check_compliance(full_text)
+
+        # Save to database
+        gen_id = str(uuid.uuid4())
+        gen_prelanding = GeneratedPrelanding(
+            gen_id=gen_id,
+            scenario_id=scenario_id,
+            target_geo=geo,
+            target_language=language,
+            target_vertical=vertical,
+            offer=offer,
+            persona=persona,
+            compliance_level=compliance_level,
+            beginning_text=beginning,
+            middle_text=middle,
+            end_text=end,
+            generated_text=full_text,
+            source_prelanding_ids=source_ids,
+            compliance_passed=1 if compliance_result['passed'] else 0,
+            compliance_issues=compliance_result.get('issues', [])
+        )
+
+        self.db.add(gen_prelanding)
+        self.db.commit()
+        self.db.refresh(gen_prelanding)
+
+        return {
+            'gen_id': gen_id,
+            'beginning': beginning,
+            'middle': middle,
+            'end': end,
+            'full_text': full_text,
+            'scenario': {
+                'id': scenario.id,
+                'name': scenario.name,
+                'name_ru': scenario.name_ru
+            },
+            'compliance_passed': compliance_result['passed'],
+            'compliance_issues': compliance_result.get('issues', []),
+            'tokens_used': 0  # TODO: track tokens
+        }
+
+    def _format_rag_context(self, context: Dict) -> str:
+        """Format RAG context for prompts."""
+        if not context or not context.get('winners'):
+            return ""
+
+        sections = []
+        sections.append("**Референсы из лучших прелендингов:**\n")
+
+        if context.get('example_headings'):
+            sections.append("Примеры заголовков:")
+            for h in context['example_headings'][:3]:
+                sections.append(f"- {h}")
+
+        if context.get('example_dialogues'):
+            sections.append("\nПримеры диалогов:")
+            for d in context['example_dialogues'][:4]:
+                sections.append(f"  {d.get('speaker', 'Speaker')}: {d['text']}")
+
+        return '\n'.join(sections)
+
+    async def _generate_beginning(
+        self,
+        scenario,
+        geo: str,
+        language: str,
+        vertical: str,
+        offer: str,
+        persona_config: Dict,
+        rag_context: str
+    ) -> str:
+        """Generate beginning (700-1000 characters)."""
+
+        base_context = self._build_base_context(geo, language, vertical, offer, persona_config)
+
+        prompt = f"""
+{base_context}
+
+ЗАДАЧА: Напиши захватывающее начало прелендинга (700-1000 символов).
+
+{scenario.beginning_template}
+
+Это начало должно МАКСИМАЛЬНО ЗАЦЕПИТЬ читателя, чтобы он прочитал весь прелендинг.
+
+{rag_context}
+
+КРИТИЧЕСКИ ВАЖНО: Пиши СТРОГО на языке {language}!
+Длина: 700-1000 символов (не слов, именно символов).
+"""
+
+        response = self.client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert prelanding copywriter specializing in high-conversion sales copy."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.8,
+            max_tokens=2000
+        )
+
+        return response.choices[0].message.content.strip()
+
+    async def _generate_middle(
+        self,
+        scenario,
+        geo: str,
+        language: str,
+        vertical: str,
+        offer: str,
+        persona_config: Dict,
+        beginning: str,
+        rag_context: str
+    ) -> str:
+        """Generate middle (main scenario)."""
+
+        base_context = self._build_base_context(geo, language, vertical, offer, persona_config)
+
+        prompt = f"""
+{base_context}
+
+КОНТЕКСТ: Ты уже написал начало прелендинга:
+---
+{beginning}
+---
+
+ЗАДАЧА: Теперь напиши основную часть прелендинга по следующему сценарию:
+
+{scenario.middle_template}
+
+{rag_context}
+
+ВАЖНО:
+- Продолжи повествование естественно после начала
+- Пиши СТРОГО на языке {language}!
+- Длина: 2000-3000 слов
+- Сохрани тон и стиль из начала
+"""
+
+        response = self.client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert prelanding copywriter specializing in high-conversion sales copy."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.8,
+            max_tokens=8000
+        )
+
+        return response.choices[0].message.content.strip()
+
+    async def _generate_end(
+        self,
+        scenario,
+        geo: str,
+        language: str,
+        vertical: str,
+        offer: str,
+        persona_config: Dict,
+        beginning: str,
+        middle: str,
+        rag_context: str
+    ) -> str:
+        """Generate end (proofs + reviews)."""
+
+        base_context = self._build_base_context(geo, language, vertical, offer, persona_config)
+
+        # Take snippets for context
+        beginning_snippet = beginning[:300] if len(beginning) > 300 else beginning
+        middle_snippet = middle[:500] if len(middle) > 500 else middle
+
+        prompt = f"""
+{base_context}
+
+КОНТЕКСТ: Ты написал прелендинг с таким началом:
+---
+{beginning_snippet}...
+---
+
+И такой серединой:
+---
+{middle_snippet}...
+---
+
+ЗАДАЧА: Напиши завершающую часть прелендинга:
+
+{scenario.end_template}
+
+{rag_context}
+
+ВАЖНО:
+- Естественно завершай историю
+- Пиши СТРОГО на языке {language}!
+- Длина: 1000-1500 слов
+- Включи конкретные доказательства и отзывы
+- Описания скриншотов должны быть детальными
+"""
+
+        response = self.client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert prelanding copywriter specializing in high-conversion sales copy."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.8,
+            max_tokens=5000
+        )
+
+        return response.choices[0].message.content.strip()
+
+    def _build_base_context(
+        self,
+        geo: str,
+        language: str,
+        vertical: str,
+        offer: str,
+        persona_config: Dict
+    ) -> str:
+        """Build base context for all generation prompts."""
+
+        cultural_ctx = self.GEO_CULTURAL_CONTEXT.get(geo.upper(), self.DEFAULT_CULTURAL_CONTEXT)
+
+        return f"""**Параметры генерации:**
+- Offer: {offer}
+- Target Country: {cultural_ctx['country_name']} ({geo})
+- Target Language: {language}
+- Local Currency: {cultural_ctx['currency']}
+- Vertical: {vertical}
+- Persona Tone: {persona_config['tone']}
+- Persona Hook: {persona_config['hook']}
+
+**⚠️ ABSOLUTE LANGUAGE REQUIREMENT ⚠️**
+The ENTIRE output MUST be written in **{language}** language.
+Use {cultural_ctx['currency']} for all monetary references.
+"""
+
 

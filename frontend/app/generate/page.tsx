@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Wand2, Loader2, Download, FileText, Code, Lightbulb, Sparkles, Flame, PartyPopper, HelpCircle, GraduationCap, TrendingUp, BarChart3, Coins, Rocket, Briefcase, Monitor, Star, Search } from 'lucide-react';
+import { Wand2, Loader2, Download, FileText, Code, Lightbulb, Sparkles, Flame, PartyPopper, HelpCircle, GraduationCap, TrendingUp, BarChart3, Coins, Rocket, Briefcase, Monitor, Star, Search, Settings } from 'lucide-react';
 import axios from 'axios';
 import Slider from '../components/Slider';
 import Tooltip from '../components/Tooltip';
+import ScenarioManager from '../components/ScenarioManager';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -16,6 +17,7 @@ export default function GeneratePage() {
         vertical: 'crypto',
         offer: '',
         persona: 'aggressive_investigator',
+        scenario_id: null as number | null,
         compliance_level: 'strict_facebook',
         format: 'interview',
         target_length: 800,
@@ -25,6 +27,25 @@ export default function GeneratePage() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
     const [activeTab, setActiveTab] = useState('text');
+    const [scenarios, setScenarios] = useState<any[]>([]);
+    const [showScenarioManager, setShowScenarioManager] = useState(false);
+
+    // Load scenarios on mount
+    useEffect(() => {
+        fetchScenarios();
+    }, []);
+
+    const fetchScenarios = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/scenarios`);
+            setScenarios(response.data);
+            if (response.data.length > 0 && !formData.scenario_id) {
+                setFormData(prev => ({ ...prev, scenario_id: response.data[0].id }));
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки сценариев:', error);
+        }
+    };
 
     // GEO options with cultural context hints
     const geoOptions = [
@@ -69,7 +90,25 @@ export default function GeneratePage() {
         setResult(null);
 
         try {
-            const response = await axios.post(`${API_URL}/api/generate`, formData);
+            // Use scenario-based generation if scenario is selected
+            const endpoint = formData.scenario_id
+                ? `${API_URL}/api/generate/with-scenario`
+                : `${API_URL}/api/generate`;
+
+            const requestData = formData.scenario_id
+                ? {
+                    scenario_id: formData.scenario_id,
+                    geo: formData.geo,
+                    language: formData.language,
+                    vertical: formData.vertical,
+                    offer: formData.offer,
+                    persona: formData.persona,
+                    compliance_level: formData.compliance_level,
+                    use_rag: formData.use_rag
+                }
+                : formData;
+
+            const response = await axios.post(endpoint, requestData);
             setResult(response.data);
         } catch (error: any) {
             console.error('Ошибка генерации:', error);
@@ -211,6 +250,38 @@ export default function GeneratePage() {
                                 </div>
                             </div>
 
+                            {/* Scenario Selection */}
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="block text-sm font-medium">Сценарий (3-частная структура)</label>
+                                    <button
+                                        type="button"
+                                        className="text-xs text-muted-foreground hover:text-primary flex items-center"
+                                        onClick={() => setShowScenarioManager(true)}
+                                    >
+                                        <Settings className="w-3 h-3 mr-1" />
+                                        Управление
+                                    </button>
+                                </div>
+                                <select
+                                    className="w-full bg-muted border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                    value={formData.scenario_id || ''}
+                                    onChange={(e) => setFormData({ ...formData, scenario_id: e.target.value ? parseInt(e.target.value) : null })}
+                                >
+                                    <option value="">Без сценария (обычная генерация)</option>
+                                    {scenarios.map((scenario) => (
+                                        <option key={scenario.id} value={scenario.id}>
+                                            {scenario.name_ru}
+                                        </option>
+                                    ))}
+                                </select>
+                                {formData.scenario_id && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {scenarios.find(s => s.id === formData.scenario_id)?.description}
+                                    </p>
+                                )}
+                            </div>
+
                             {/* Compliance Level */}
                             <div>
                                 <label className="block text-sm font-medium mb-2">Уровень Compliance</label>
@@ -311,7 +382,31 @@ export default function GeneratePage() {
                                 {/* Content */}
                                 <div className="bg-muted rounded-lg p-4 mb-4 max-h-[500px] overflow-y-auto">
                                     {activeTab === 'text' && (
-                                        <pre className="whitespace-pre-wrap text-sm font-mono">{result.generated_text}</pre>
+                                        <div className="space-y-4">
+                                            {/* If scenario-based generation, show three parts */}
+                                            {result.beginning && result.middle && result.end ? (
+                                                <>
+                                                    <div>
+                                                        <div className="text-xs font-bold text-primary mb-2">НАЧАЛО (700-1000 символов):</div>
+                                                        <pre className="whitespace-pre-wrap text-sm font-mono">{result.beginning}</pre>
+                                                    </div>
+                                                    <div className="border-t border-border pt-4">
+                                                        <div className="text-xs font-bold text-primary mb-2">СЕРЕДИНА (Основной сценарий):</div>
+                                                        <pre className="whitespace-pre-wrap text-sm font-mono">{result.middle}</pre>
+                                                    </div>
+                                                    <div className="border-t border-border pt-4">
+                                                        <div className="text-xs font-bold text-primary mb-2">КОНЕЦ (Доказательства + Отзывы):</div>
+                                                        <pre className="whitespace-pre-wrap text-sm font-mono">{result.end}</pre>
+                                                    </div>
+                                                    <div className="border-t border-border pt-4">
+                                                        <div className="text-xs font-bold text-secondary mb-2">ПОЛНЫЙ ТЕКСТ:</div>
+                                                        <pre className="whitespace-pre-wrap text-sm font-mono">{result.full_text}</pre>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <pre className="whitespace-pre-wrap text-sm font-mono">{result.generated_text || result.full_text}</pre>
+                                            )}
+                                        </div>
                                     )}
                                     {activeTab === 'html' && (
                                         <div>
@@ -370,6 +465,13 @@ export default function GeneratePage() {
                         )}
                     </motion.div>
                 </div>
+
+                {/* Scenario Manager Modal */}
+                <ScenarioManager
+                    open={showScenarioManager}
+                    onClose={() => setShowScenarioManager(false)}
+                    onUpdate={fetchScenarios}
+                />
             </div>
         </div >
     );

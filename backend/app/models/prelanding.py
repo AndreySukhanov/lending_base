@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON, For
 from sqlalchemy.orm import relationship
 import enum
 from app.database import Base
+from app.models.scenario import Scenario
 
 
 class PrelendingStatus(str, enum.Enum):
@@ -117,11 +118,22 @@ class GeneratedPrelanding(Base):
     
     # Source prelandings used
     source_prelanding_ids = Column(JSON, default=list)  # List of IDs
-    
+
+    # Scenario-based generation
+    scenario_id = Column(Integer, ForeignKey("scenarios.id"), nullable=True)
+
+    # Three-part structure (for scenario-based generation)
+    beginning_text = Column(Text, nullable=True)  # Beginning (teaser, 700-1000 chars)
+    middle_text = Column(Text, nullable=True)  # Middle (main scenario)
+    end_text = Column(Text, nullable=True)  # End (proofs + reviews)
+
     # Output
-    generated_text = Column(Text, nullable=False)
+    generated_text = Column(Text, nullable=False)  # Full concatenated text
     generated_html = Column(Text, nullable=True)
     visual_brief = Column(Text, nullable=True)
+
+    # Relationship to scenario
+    scenario = relationship("Scenario")
     
     # Compliance checks
     compliance_issues = Column(JSON, default=list)
