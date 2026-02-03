@@ -562,7 +562,7 @@ function NameGenerator() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 items-center">
+                <div className="grid grid-cols-2 gap-3 items-end">
                     <div>
                         <label className="block text-sm font-medium mb-2">Количество: {count}</label>
                         <input
@@ -574,7 +574,7 @@ function NameGenerator() {
                             className="w-full"
                         />
                     </div>
-                    <div className="flex items-center justify-center h-full">
+                    <div>
                         <div className="flex items-center justify-between p-3 bg-muted rounded-lg w-full">
                             <label className="text-sm font-medium">Никнеймы</label>
                             <input
