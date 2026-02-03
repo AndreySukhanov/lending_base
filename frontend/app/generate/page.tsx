@@ -562,26 +562,29 @@ function NameGenerator() {
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium mb-2">Количество: {count}</label>
-                    <input
-                        type="range"
-                        min={1}
-                        max={50}
-                        value={count}
-                        onChange={(e) => setCount(parseInt(e.target.value))}
-                        className="w-full"
-                    />
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <label className="text-sm font-medium">Включить никнеймы</label>
-                    <input
-                        type="checkbox"
-                        checked={includeNickname}
-                        onChange={(e) => setIncludeNickname(e.target.checked)}
-                        className="w-4 h-4"
-                    />
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Количество: {count}</label>
+                        <input
+                            type="range"
+                            min={1}
+                            max={50}
+                            value={count}
+                            onChange={(e) => setCount(parseInt(e.target.value))}
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="flex items-end">
+                        <div className="flex items-center justify-between p-3 bg-muted rounded-lg w-full">
+                            <label className="text-sm font-medium">Никнеймы</label>
+                            <input
+                                type="checkbox"
+                                checked={includeNickname}
+                                onChange={(e) => setIncludeNickname(e.target.checked)}
+                                className="w-4 h-4"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <button
@@ -771,39 +774,40 @@ function ReviewGenerator() {
                     </select>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium mb-2">Длина</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        {[
-                            { value: 'short', label: 'Короткий' },
-                            { value: 'medium', label: 'Средний' }
-                        ].map((l) => (
-                            <button
-                                key={l.value}
-                                type="button"
-                                onClick={() => setLength(l.value as 'short' | 'medium')}
-                                className={`py-2 px-3 rounded-lg border transition-colors text-sm ${
-                                    length === l.value
-                                        ? 'bg-primary text-white border-primary'
-                                        : 'bg-muted border-border hover:border-primary/50'
-                                }`}
-                            >
-                                {l.label}
-                            </button>
-                        ))}
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Длина</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {[
+                                { value: 'short', label: 'Кор.' },
+                                { value: 'medium', label: 'Сред.' }
+                            ].map((l) => (
+                                <button
+                                    key={l.value}
+                                    type="button"
+                                    onClick={() => setLength(l.value as 'short' | 'medium')}
+                                    className={`py-2 px-2 rounded-lg border transition-colors text-sm ${
+                                        length === l.value
+                                            ? 'bg-primary text-white border-primary'
+                                            : 'bg-muted border-border hover:border-primary/50'
+                                    }`}
+                                >
+                                    {l.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-2">Количество: {count}</label>
-                    <input
-                        type="range"
-                        min={1}
-                        max={20}
-                        value={count}
-                        onChange={(e) => setCount(parseInt(e.target.value))}
-                        className="w-full"
-                    />
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Кол-во: {count}</label>
+                        <input
+                            type="range"
+                            min={1}
+                            max={20}
+                            value={count}
+                            onChange={(e) => setCount(parseInt(e.target.value))}
+                            className="w-full mt-2"
+                        />
+                    </div>
                 </div>
 
                 <button
