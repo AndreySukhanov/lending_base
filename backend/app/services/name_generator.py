@@ -107,6 +107,29 @@ class NameGenerator:
 
         country = country_names.get(geo.upper(), geo)
 
+        # Формат JSON в зависимости от include_nickname
+        if include_nickname:
+            json_format = '''[
+    {
+        "first_name": "Имя",
+        "last_name": "Фамилия",
+        "nickname": "nick123",
+        "gender": "male"
+    },
+    ...
+]'''
+            no_nickname_warning = ""
+        else:
+            json_format = '''[
+    {
+        "first_name": "Имя",
+        "last_name": "Фамилия",
+        "gender": "male"
+    },
+    ...
+]'''
+            no_nickname_warning = "\nВАЖНО: НЕ добавляй поле nickname - оно не нужно!"
+
         return f"""Сгенерируй {count} реалистичных имён для страны: {country} ({geo})
 
 {gender_instruction}
@@ -130,15 +153,8 @@ class NameGenerator:
 Верни результат СТРОГО в виде JSON массива объектов, без дополнительного текста до или после.
 
 Формат:
-[
-    {{
-        "first_name": "Имя",
-        "last_name": "Фамилия",
-        "nickname": "nick123",
-        "gender": "male"
-    }},
-    ...
-]
+{json_format}
+{no_nickname_warning}
 
 Сгенерируй {count} имён сейчас:"""
 
