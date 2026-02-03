@@ -75,7 +75,27 @@ function NameGenerator() {
         const text = names.map(n =>
             `${n.first_name} ${n.last_name}${n.nickname ? ` (@${n.nickname})` : ''} [${n.gender}]`
         ).join('\n');
-        navigator.clipboard.writeText(text);
+
+        // Проверяем доступность Clipboard API (работает только на HTTPS или localhost)
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text);
+        } else {
+            // Fallback метод для HTTP
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (error) {
+                console.error('Ошибка копирования:', error);
+            }
+            document.body.removeChild(textArea);
+        }
+
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -257,7 +277,27 @@ function ReviewGenerator() {
         const text = reviews.map(r =>
             `${r.author_name} (${r.rating}/5)\n${r.text}\n+${r.amount} ${r.currency}\n📷 ${r.screenshot_description}\n`
         ).join('\n---\n\n');
-        navigator.clipboard.writeText(text);
+
+        // Проверяем доступность Clipboard API (работает только на HTTPS или localhost)
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text);
+        } else {
+            // Fallback метод для HTTP
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (error) {
+                console.error('Ошибка копирования:', error);
+            }
+            document.body.removeChild(textArea);
+        }
+
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
