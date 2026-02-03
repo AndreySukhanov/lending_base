@@ -519,14 +519,14 @@ function NameGenerator() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-6"
+            className="glass-card p-6 flex flex-col h-full"
         >
             <div className="flex items-center mb-4">
                 <Users className="w-6 h-6 text-primary mr-2" />
                 <h3 className="text-xl font-bold">Генератор Имён</h3>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1 flex flex-col">
                 <div>
                     <label className="block text-sm font-medium mb-2">Страна</label>
                     <select
@@ -586,6 +586,8 @@ function NameGenerator() {
                         </div>
                     </div>
                 </div>
+
+                <div className="flex-1"></div>
 
                 <button
                     onClick={handleGenerate}
@@ -720,14 +722,14 @@ function ReviewGenerator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-card p-6"
+            className="glass-card p-6 flex flex-col h-full"
         >
             <div className="flex items-center mb-4">
                 <Star className="w-6 h-6 text-primary mr-2" />
                 <h3 className="text-xl font-bold">Генератор Отзывов</h3>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1 flex flex-col">
                 <div className="grid grid-cols-2 gap-3">
                     <div>
                         <label className="block text-sm font-medium mb-2">Страна</label>
@@ -809,6 +811,8 @@ function ReviewGenerator() {
                         />
                     </div>
                 </div>
+
+                <div className="flex-1"></div>
 
                 <button
                     onClick={handleGenerate}
