@@ -201,9 +201,24 @@ export default function GeneratePage() {
                                     onChange={(e) => setFormData({ ...formData, vertical: e.target.value })}
                                 >
                                     <option value="crypto">Crypto</option>
-                                    <option value="finance">Финансы</option>
                                     <option value="forex">Forex</option>
+                                    <option value="stocks">Stocks / Акции</option>
                                     <option value="investment">Инвестиции</option>
+                                    <option value="binary">Бинарные опционы</option>
+                                    <option value="trading">Трейдинг</option>
+                                    <option value="nft">NFT / Web3</option>
+                                    <option value="gambling">Gambling / Казино</option>
+                                    <option value="betting">Betting / Ставки</option>
+                                    <option value="nutra">Nutra / Здоровье</option>
+                                    <option value="weight_loss">Похудение</option>
+                                    <option value="dating">Dating / Знакомства</option>
+                                    <option value="loans">Займы / Кредиты</option>
+                                    <option value="insurance">Страхование</option>
+                                    <option value="real_estate">Недвижимость</option>
+                                    <option value="education">Образование</option>
+                                    <option value="sweepstakes">Sweepstakes</option>
+                                    <option value="ecommerce">E-commerce</option>
+                                    <option value="software">VPN / Software</option>
                                 </select>
                             </div>
 
@@ -771,8 +786,23 @@ function ReviewGenerator() {
                     >
                         <option value="crypto">Crypto</option>
                         <option value="forex">Forex</option>
-                        <option value="stocks">Stocks</option>
-                        <option value="general_investment">General Investment</option>
+                        <option value="stocks">Stocks / Акции</option>
+                        <option value="investment">Инвестиции</option>
+                        <option value="binary">Бинарные опционы</option>
+                        <option value="trading">Трейдинг</option>
+                        <option value="nft">NFT / Web3</option>
+                        <option value="gambling">Gambling / Казино</option>
+                        <option value="betting">Betting / Ставки</option>
+                        <option value="nutra">Nutra / Здоровье</option>
+                        <option value="weight_loss">Похудение</option>
+                        <option value="dating">Dating / Знакомства</option>
+                        <option value="loans">Займы / Кредиты</option>
+                        <option value="insurance">Страхование</option>
+                        <option value="real_estate">Недвижимость</option>
+                        <option value="education">Образование</option>
+                        <option value="sweepstakes">Sweepstakes</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="software">VPN / Software</option>
                     </select>
                 </div>
 
