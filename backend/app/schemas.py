@@ -191,6 +191,7 @@ class ScenarioGenerationResponse(BaseModel):
     middle: str
     end: str
     full_text: str
+    generated_html: Optional[str] = None
     scenario: Dict[str, Any]
     compliance_passed: bool = True
     compliance_issues: List[dict] = []
