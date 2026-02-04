@@ -218,7 +218,6 @@ export default function GeneratePage() {
                                     <option value="education">Образование</option>
                                     <option value="sweepstakes">Sweepstakes</option>
                                     <option value="ecommerce">E-commerce</option>
-                                    <option value="software">VPN / Software</option>
                                 </select>
                             </div>
 
@@ -802,7 +801,6 @@ function ReviewGenerator() {
                         <option value="education">Образование</option>
                         <option value="sweepstakes">Sweepstakes</option>
                         <option value="ecommerce">E-commerce</option>
-                        <option value="software">VPN / Software</option>
                     </select>
                 </div>
 
