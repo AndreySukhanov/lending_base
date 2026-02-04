@@ -161,18 +161,13 @@ async def generate_with_scenario(
 
         print("Scenario-based generation completed successfully")
 
-        # Generate HTML from full text
-        formatter = OutputFormatter()
-        generated_html = formatter.format_as_html(result['full_text'])
-        print("HTML formatting completed")
-
         return ScenarioGenerationResponse(
             gen_id=result['gen_id'],
             beginning=result['beginning'],
             middle=result['middle'],
             end=result['end'],
             full_text=result['full_text'],
-            generated_html=generated_html,
+            generated_html=result['generated_html'],
             scenario=result['scenario'],
             compliance_passed=result['compliance_passed'],
             compliance_issues=result['compliance_issues'],

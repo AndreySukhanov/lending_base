@@ -633,6 +633,11 @@ Generate the complete prelanding copy now (remember: in {language} language!):
         # Concatenate parts
         full_text = f"{beginning}\n\n{middle}\n\n{end}"
 
+        # Generate HTML
+        from app.services.output_formatter import OutputFormatter
+        formatter = OutputFormatter()
+        generated_html = formatter.format_as_html(full_text)
+
         # Compliance check
         from app.services.compliance_checker import ComplianceChecker
         compliance_checker = ComplianceChecker(compliance_level=compliance_level)
@@ -653,6 +658,7 @@ Generate the complete prelanding copy now (remember: in {language} language!):
             middle_text=middle,
             end_text=end,
             generated_text=full_text,
+            generated_html=generated_html,
             source_prelanding_ids=source_ids,
             compliance_passed=1 if compliance_result['passed'] else 0,
             compliance_issues=compliance_result.get('issues', [])
@@ -668,6 +674,7 @@ Generate the complete prelanding copy now (remember: in {language} language!):
             'middle': middle,
             'end': end,
             'full_text': full_text,
+            'generated_html': generated_html,
             'scenario': {
                 'id': scenario.id,
                 'name': scenario.name,
